@@ -20,8 +20,8 @@ dependencies:
   speech_to_text: ^6.6.0
   translator: ^1.0.0
 
-  pose: ^1.1.4
-  path_provider: ^2.1.2
+  pose: ^1.1.5
+  # path_provider: ^2.1.2
 
 
 dev_dependencies:
@@ -36,9 +36,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/gif/
+    - assets/gif/demo.gif
     - assets/pose/sample.pose
-  #   - images/a_dot_ham.jpeg
 
   # fonts:
   #   - family: Schyler

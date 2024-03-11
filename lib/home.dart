@@ -1,13 +1,14 @@
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:pose/pose.dart';
+import 'package:flutter/material.dart';
+
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:translator/translator.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+
+import 'package:pose/pose.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -23,6 +24,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool speechEnabled = false;
   String recogWords = "";
   String words = "";
+  bool pressed = false;
+  Uint8List? imgdata;
 
   @override
   void initState() {
@@ -45,6 +48,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> poseToGif() async {
+    ByteData data = await rootBundle.load('assets/pose/sample.pose');
+    Uint8List fileContent = data.buffer.asUint8List();
+    Pose pose = Pose.read(fileContent);
+    PoseVisualizer p = PoseVisualizer(pose, thickness: 2);
+    Uint8List gifData = await p.generateGif(p.draw());
+    setState(() {
+      imgdata = gifData;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -85,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 alignment: Alignment.center,
                 child: Text(
                   words,
-                  style: TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ), // This is an empty container to fill the remaining space
             ),
@@ -105,14 +120,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                       if (speechEnabled) {
                         v2t.listen(
-                          onResult: (result) {
-                            setState(() {
-                              //words = result.recognizedWords;
-                              recogWords = result.recognizedWords;
-                            });
-                          },
-                          localeId: 'hi'
-                        );
+                            onResult: (result) {
+                              setState(() {
+                                //words = result.recognizedWords;
+                                recogWords = result.recognizedWords;
+                              });
+                            },
+                            localeId: 'hi');
                         translateText();
                       }
                     },
@@ -124,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       //translateText();
                     },
                     child: Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           color: Colors.blue, shape: BoxShape.circle),
                       child: Padding(
                         padding: const EdgeInsets.all(15),
@@ -149,135 +163,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           child: Center(
-            child: Image.asset('assets/gif/demo.gif',width: 300,height: 500,)
+            child: !pressed
+                ? ElevatedButton(
+                    onPressed: () async {
+                      pressed = true;
+                      setState(() {});
+                      poseToGif();
+                    },
+                    child: const Text('Demo'),
+                  )
+                : imgdata != null
+                    ? Center(
+                        child: Image.memory(
+                          imgdata!,
+                        ),
+                      )
+                    : const CircularProgressIndicator(),
           ),
         ),
       ),
     );
   }
 }
-
-/*import 'dart:io';
-import 'dart:typed_data';
-import 'package:pose/pose.dart';
-import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart';
-import 'package:translator/translator.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-
-class homePage extends StatefulWidget {
-  const homePage({super.key});
-
-  @override
-  State<homePage> createState() => _homePageState();
-}
-
-class _homePageState extends State<homePage> {
-  final SpeechToText v2t = SpeechToText();
-  final GoogleTranslator translator = GoogleTranslator();
-
-  bool speechEnabled = false;
-  String recogWords = "";
-  String words = "";
-
-  @override
-  void initState() {
-    super.initState();
-    initSpeech();
-  }
-
-  void initSpeech() async {
-    speechEnabled = await v2t.initialize();
-    setState(() {});
-  }
-
-  void startListening() async {
-    await v2t.listen(onResult: onSpeechResult,localeId:'hi'); 
-    setState(() {});
-  }
-
-  void stopListening() async {
-    await v2t.stop();
-    setState(() {});
-    translateText();
-  }
-
-  void onSpeechResult(result) {
-    setState(() {
-      //words = "${result.recognizedWords}";
-      recogWords = "${result.recognizedWords}";
-    });
-  }
-
-  void translateText() async {
-    if (recogWords.isNotEmpty) {
-      Translation translation =
-          await translator.translate(recogWords, to: 'en');
-      setState(() {
-        words = translation.text;
-      });
-    }
-  }
-
-Future<void> poseToGif() async {
-  File file = File("assets/pose/sample.pose");
-  Uint8List fileContent = file.readAsBytesSync();
-  Pose pose = Pose.read(fileContent);
-  PoseVisualizer p = PoseVisualizer(pose);
-  p.saveGif("assets/gif/sample.gif", p.draw());
-} 
-
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign Bridge'),
-      ),
-      body: Column(
-        children: [
-          // Top 3/4th - Display Box
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey, 
-              ),
-              // use a GIF display widget here
-              child: Center(
-                child: Image.asset('assets/gif/demo.gif',width: 300,height: 500,)
-              ),
-            ),
-          ),
-          // Bottom 1/4th - Text Box
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Container(
-                    child: Text(words),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      //IconButton(onPressed: () {}, icon: const Icon(Icons.mic)),
-                      FloatingActionButton(
-                        onPressed:
-                            v2t.isListening ? stopListening : startListening,
-                        tooltip: "Listen",
-                        child: Icon(
-                            v2t.isNotListening ? Icons.mic_off : Icons.mic),
-                      ),
-                      IconButton(onPressed: poseToGif, icon: const Icon(Icons.send))
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}*/
