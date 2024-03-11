@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sign Bridge',
+      // title: 'Sign Bridge',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
