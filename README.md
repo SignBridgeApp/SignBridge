@@ -1,6 +1,6 @@
 # SignBridge
 
-![Logo](https://raw.githubusercontent.com/AnanyaBhatKinila/SignBridge/master/assets/logo.png)
+![Logo](https://raw.githubusercontent.com/SignBridgeApp/SignBridge/master/assets/logo.sng)
 
 Effortless Real-Time Sign Language Production
 

@@ -53,12 +53,14 @@ flutter:
   #
 
 
+# Colors:: Silver: #e0e7f1 rgba(224,231,241,255), Black: #272733 rgba(39,39,51,255)
+
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/logo.png"
   remove_alpha_ios: true
-  adaptive_icon_background: "#FFA8C8FB" # #a8c8fb, rgba(168,200,251,255)
+  adaptive_icon_background: "#FFE0E7F1" 
   adaptive_icon_foreground: "assets/logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
