@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:signbridge/requests/requests.dart';
 
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:translator/translator.dart';
@@ -172,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         isListening = false;
                       });
                       v2t.stop();
+
                       //translateText();
                     },
                     child: Container(
@@ -200,22 +202,37 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           child: Center(
-            child: !pressed
-                ? ElevatedButton(
-                    onPressed: () async {
-                      pressed = true;
-                      setState(() {});
-                      poseToGif();
-                    },
-                    child: const Text('Demo'),
-                  )
-                : imgdata != null
-                    ? Center(
-                        child: Image.memory(
-                          imgdata!,
-                        ),
-                      )
-                    : const CircularProgressIndicator(),
+              child: FutureBuilder(
+                future: getSign(words),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.data == null) {
+                    return Container(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
+                  } else {
+                    return Image.network('https://bipinkrish-signbridge.hf.space/sign2img?sign=${snapshot.data}'
+                    );
+                  }
+                },
+              )
+              /*child: !pressed
+                  ? ElevatedButton(
+                      onPressed: () async {
+                        pressed = true;
+                        setState(() {});
+                        poseToGif();
+                      },
+                      child: const Text('Demo'),
+                    )
+                  : imgdata != null
+                      ? Center(
+                          child: Image.memory(
+                            imgdata!,
+                          ),
+                        )
+                      : const CircularProgressIndicator(),*/
           ),
         ),
       ),
