@@ -26,11 +26,15 @@ class _MyHomePageState extends State<MyHomePage> {
   String words = "";
   bool pressed = false;
   Uint8List? imgdata;
+  String selectedId = "";
 
   @override
   void initState() {
     super.initState();
     initSpeech();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      IdSelectionDialog();
+    });
   }
 
   void initSpeech() async {
@@ -57,6 +61,39 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       imgdata = gifData;
     });
+  }
+
+  Future<void> IdSelectionDialog() async {
+    selectedId = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Select voice input language'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text('English'),
+                  onTap: () {
+                    Navigator.of(context).pop('en_US');
+                  },
+                ),
+                ListTile(
+                  title: Text('Hindi'),
+                  onTap: () {
+                    Navigator.of(context).pop('hi');
+                  },
+                ),
+                ListTile(
+                  title: Text('Kannada'),
+                  onTap: () {
+                    Navigator.of(context).pop('kn');
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -126,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 recogWords = result.recognizedWords;
                               });
                             },
-                            localeId: 'hi');
+                            localeId: selectedId);
                         translateText();
                       }
                     },
