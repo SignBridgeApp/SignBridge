@@ -1,9 +1,18 @@
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+// ignore_for_file: avoid_print
 
-Future<String> getSign(String text) async {
-  String url = "https://bipinkrish-signbridge.hf.space/text2sign?text=$text";
-  final response = await http.get(Uri.parse(url));
-  var responseData = json.decode(response.body);
-  return responseData['sign'];
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:signbridge/constants.dart';
+
+Future<String?> getSign(String text) async {
+  if (text == "") return null;
+  String url = "$text2signURL?text=$text";
+  try {
+    final response = await http.get(Uri.parse(url));
+    var responseData = json.decode(response.body);
+    return responseData['sign'];
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
 }
