@@ -1,15 +1,14 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:signbridge/requests/requests.dart';
+import 'package:signbridge/requests.dart';
 
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:translator/translator.dart';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
-import 'package:pose/pose.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -53,40 +52,29 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> poseToGif() async {
-    ByteData data = await rootBundle.load('assets/pose/sample.pose');
-    Uint8List fileContent = data.buffer.asUint8List();
-    Pose pose = Pose.read(fileContent);
-    PoseVisualizer p = PoseVisualizer(pose, thickness: 2);
-    Uint8List gifData = await p.generateGif(p.draw());
-    setState(() {
-      imgdata = gifData;
-    });
-  }
-
   Future<void> IdSelectionDialog() async {
     selectedId = await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Select voice input language'),
+            title: const Text('Select voice input language'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  title: Text('English'),
+                  title: const Text('English'),
                   onTap: () {
                     Navigator.of(context).pop('en_US');
                   },
                 ),
                 ListTile(
-                  title: Text('Hindi'),
+                  title: const Text('Hindi'),
                   onTap: () {
                     Navigator.of(context).pop('hi');
                   },
                 ),
                 ListTile(
-                  title: Text('Kannada'),
+                  title: const Text('Kannada'),
                   onTap: () {
                     Navigator.of(context).pop('kn');
                   },
@@ -203,29 +191,25 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Center(
               child: FutureBuilder(
-                future: getSign(words),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return Container(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    );
-                  } else {
-                    return Image.network('https://bipinkrish-signbridge.hf.space/sign2img?sign=${snapshot.data}'
-                    );
-                  }
-                },
-              )
-          ),
+            future: getSign(words),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null) {
+                return const CircularProgressIndicator(
+                  color: Colors.white,
+                );
+              } else {
+                return Image.network(
+                    'https://bipinkrish-signbridge.hf.space/sign2img?sign=${snapshot.data}');
+              }
+            },
+          )),
         ),
       ),
     );
   }
 }
 
-
-              /*child: !pressed
+/*child: !pressed
                   ? ElevatedButton(
                       onPressed: () async {
                         pressed = true;
