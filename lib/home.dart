@@ -162,10 +162,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               setState(() {
                                 //words = result.recognizedWords;
                                 recogWords = result.recognizedWords;
+                                translateText();
                               });
                             },
                             localeId: selectedId);
-                        translateText();
                       }
                     },
                     onTapUp: (details) {
@@ -173,8 +173,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         isListening = false;
                       });
                       v2t.stop();
-
-                      //translateText();
                     },
                     child: Container(
                       decoration: const BoxDecoration(
@@ -203,21 +201,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Center(
               child: FutureBuilder(
-                future: getSign(words),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return Container(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    );
-                  } else {
-                    return Image.network('https://bipinkrish-signbridge.hf.space/sign2img?sign=${snapshot.data}'
-                    );
-                  }
-                },
-              )
-          ),
+            future: getSign(words),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null) {
+                return Container(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                );
+              } else {
+                return Image.network(
+                    'https://bipinkrish-signbridge.hf.space/sign2img?sign=${snapshot.data}');
+              }
+            },
+          )),
         ),
       ),
     );
