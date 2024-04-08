@@ -5,10 +5,10 @@ on:
 
 env:
   FLUTTER_VERSION: "3.13.2"
-  APK_BUILD_DIR: "/tmp/build"
+  APP_NAME: "SignBridge"
 
 jobs:
-  build_apk:
+  build_and_release:
     runs-on: ubuntu-22.04
 
     steps:
@@ -29,37 +29,41 @@ jobs:
       - name: Get version from pubspec.yaml
         id: get_version
         run: |
-          VERSION=$(sed -n 's/^version: \([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' pubspec.yaml)
+          VERSION=$(sed -n 's/^version:[[:space:]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' pubspec.yaml)
           echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Build APK (normal)
         run: flutter build apk
 
-      - name: Upload APK
+      - name: Upload APK (normal)
         uses: actions/upload-artifact@v3
         with:
-          name: apk-result
+          name: apk-result-normal
           path: build/app/outputs/flutter-apk/app-release.apk
 
-  release:
-    needs: [build_apk]
-    runs-on: ubuntu-22.04
+      - name: Build APK (split-per-ABI)
+        run: flutter build apk --split-per-abi
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download APK artifact
-        uses: actions/download-artifact@v3
+      - name: Upload APK (split-per-ABI arm64-v8a)
+        uses: actions/upload-artifact@v3
         with:
-          name: apk-result
-          path: ${{ github.workspace }}/apk-result
+          name: apk-result-split-per-abi-arm64-v8a
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
-      - name: Copy APK file to root
-        run: cp ${{ github.workspace }}/apk-result/*.apk result.apk
+      - name: Upload APK (split-per-ABI armeabi-v7a)
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk-result-split-per-abi-armeabi-v7a
+          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+
+      - name: Upload APK (split-per-ABI x86_64)
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk-result-split-per-abi-x86_64
+          path: build/app/outputs/flutter-apk/app-x86_64-release.apk
 
       - name: Create Release
         id: create_release
@@ -67,17 +71,47 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: v${{ needs.build_apk.outputs.version }}
-          release_name: Release v${{ needs.build_apk.outputs.version }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload Normal APK Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: result.apk
-          asset_name: SignBridge-${{ needs.build_apk.outputs.version }}.apk
+          asset_path: build/app/outputs/flutter-apk/app-release.apk
+          asset_name: ${{ env.APP_NAME }}-${{ steps.get_version.outputs.version }}.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Split-Per-ABI APKs Release Assets (arm64-v8a)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          asset_name: ${{ env.APP_NAME }}-${{ steps.get_version.outputs.version }}-arm64-v8a.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Split-Per-ABI APKs Release Assets (armeabi-v7a)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          asset_name: ${{ env.APP_NAME }}-${{ steps.get_version.outputs.version }}-armeabi-v7a.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Split-Per-ABI APKs Release Assets (x86_64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/app-x86_64-release.apk
+          asset_name: ${{ env.APP_NAME }}-${{ steps.get_version.outputs.version }}-x86_64.apk
           asset_content_type: application/vnd.android.package-archive
