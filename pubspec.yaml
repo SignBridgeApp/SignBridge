@@ -1,5 +1,6 @@
 name: signbridge
 description: Effortless Real-Time Sign Language Production
+
 publish_to: "none"
 version: 1.0.0+1
 
