@@ -12,12 +12,12 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  adaptive_theme: ^3.6.0
   avatar_glow: ^3.0.1
   sliding_up_panel: ^2.0.0+1
   http: ^1.1.0
   speech_to_text: ^6.6.0
   translator: ^1.0.0
+  google_fonts: 6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -29,9 +29,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  assets:
-    - assets/gif/demo.gif
-    - assets/pose/sample.pose
+  # assets:
+  #   - assets/gif/demo.gif
+  #   - assets/pose/sample.pose
 
   # fonts:
   #   - family: Schyler
@@ -41,8 +41,6 @@ flutter:
   #         style: italic
   #         weight: 700
   #   - family: Trajan Pro
-
-# Colors:: Silver: #e0e7f1 rgba(224,231,241,255), Black: #272733 rgba(39,39,51,255)
 
 flutter_launcher_icons:
   android: "launcher_icon"
