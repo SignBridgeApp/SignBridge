@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: "3.0.1"
+  FLUTTER_VERSION: "3.13.2"
   APK_BUILD_DIR: "/tmp/build"
 
 jobs:
@@ -14,7 +14,8 @@ jobs:
       version: ${{ steps.get_version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Get version from pubspec.yaml
         id: get_version
@@ -36,7 +37,7 @@ jobs:
       - name: Upload updated lib files with generated code
         uses: actions/upload-artifact@v3
         with:
-          name: lib-files
+          name: apk-result
           path: ./lib/*
 
   build_apk:
@@ -50,10 +51,10 @@ jobs:
       - name: Download generated files
         uses: actions/download-artifact@v3
         with:
-          name: lib-files
+          name: apk-result
           path: lib
 
-      - name: Copy files to env.APK_BUILD_DIR
+      - name: Copy files to APK_BUILD_DIR
         run: |
           mkdir -p $APK_BUILD_DIR
           cp -r . $APK_BUILD_DIR
@@ -85,10 +86,20 @@ jobs:
 
   release:
     needs: [build_apk]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: apk-result
+          path: ${{ github.workspace }}/apk-result
+
+      - name: Copy APK file to root
+        run: cp ${{ github.workspace }}/apk-result/*.apk result.apk
 
       - name: Create Release
         id: create_release
@@ -100,15 +111,6 @@ jobs:
           release_name: Release v${{ needs.build.outputs.version }}
           draft: false
           prerelease: false
-
-      - name: Download apk file
-        uses: actions/download-artifact@v3
-        with:
-          name: apk-result
-          path: apk-result
-
-      - name: Copy apk file to root
-        run: cp apk-result/*.apk result.apk
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
