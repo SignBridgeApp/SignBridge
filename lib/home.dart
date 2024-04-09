@@ -27,7 +27,20 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     initSpeech();
+    //textController.addListener(_updateInputValue);
   }
+
+ /* @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  void _updateInputValue() {
+    setState(() {
+      translatedText = textController.text;
+    });
+  }*/
 
   void initSpeech() async {
     speechEnabled = await v2t.initialize();
@@ -116,10 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       } else {
                         return Center(
-                          child: Text(
-                            snapshot.data,
-                            style: TextStyle(color: grey, fontSize: 24),
-                          ));
+                            child: Text(
+                          snapshot.data,
+                          style: TextStyle(color: grey, fontSize: 24),
+                        ));
                       }
                     })
               ],
@@ -131,22 +144,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   topRight: Radius.circular(24.0),
                 ),
               ),
-              child: Align(
-                alignment: Alignment.center,
-                child: FutureBuilder(
-                  future: getSign(translatedText),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.data == null) {
-                      return const CircularProgressIndicator(
-                        color: silver,
-                      );
-                    } else {
-                      return Image.network(
-                        '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
-                      );
-                    }
-                  },
-                ),
+              child: Row(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.3,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: FutureBuilder(
+                        future: getSign(translatedText),
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.data == null) {
+                            return const CircularProgressIndicator(
+                              color: silver,
+                            );
+                          } else {
+                            return Image.network(
+                              '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width*0.7,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text('GIF',style: TextStyle(color: silver,fontSize: 24),),
+                    ),
+                  )
+                ],
               ),
             ),
           ),
