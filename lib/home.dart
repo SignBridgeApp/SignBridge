@@ -6,11 +6,10 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:translator/translator.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'theme/theme_provider.dart';
+import 'theme/theme_provider.dart'; // Import ThemeProvider class
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -23,25 +22,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String selectedId = "en_US";
   String translatedText = "";
   TextEditingController textController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
     initSpeech();
-    //textController.addListener(_updateInputValue);
   }
-
- /* @override
-  void dispose() {
-    textController.dispose();
-    super.dispose();
-  }
-
-  void _updateInputValue() {
-    setState(() {
-      translatedText = textController.text;
-    });
-  }*/
 
   void initSpeech() async {
     speechEnabled = await v2t.initialize();
@@ -64,11 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-
     return Builder(
       builder: (context) {
         final themeProvider = Provider.of<ThemeProvider>(context);
-
         return Scaffold(
           backgroundColor: themeProvider.themeData.colorScheme.background,
           body: Stack(
@@ -150,22 +133,40 @@ class _MyHomePageState extends State<MyHomePage> {
                       topRight: Radius.circular(24.0),
                     ),
                   ),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: FutureBuilder(
-                      future: getSign(translatedText),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.data == null) {
-                          return const CircularProgressIndicator(
-                            color: silver,
-                          );
-                        } else {
-                          return Image.network(
-                            '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
-                          );
-                        }
-                      },
-                    ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: FutureBuilder(
+                            future: getSign(translatedText),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.data == null) {
+                                return const CircularProgressIndicator(
+                                  color: silver,
+                                );
+                              } else {
+                                return Image.network(
+                                  '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: const Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'GIF',
+                            style: TextStyle(color: silver, fontSize: 24),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),
@@ -223,55 +224,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                          ),
-                        );
-                      } else {
-                        return Center(
-                            child: Text(
-                          snapshot.data,
-                          style: TextStyle(color: grey, fontSize: 24),
-                        ));
-                      }
-                    })
-              ],
-            ),
-            body: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24.0),
-                  topRight: Radius.circular(24.0),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width*0.3,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: FutureBuilder(
-                        future: getSign(translatedText),
-                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.data == null) {
-                            return const CircularProgressIndicator(
-                              color: silver,
-                            );
-                          } else {
-                            return Image.network(
-                              '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width*0.7,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text('GIF',style: TextStyle(color: silver,fontSize: 24),),
-                    ),
-                  )
-                ],
               ),
               Align(
                 alignment: Alignment.bottomLeft,
@@ -345,7 +297,6 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
-
     if (selectedOption != null) {
       selectedId = selectedOption;
       refresh();
