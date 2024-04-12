@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
           body: Stack(
             children: [
               SlidingUpPanel(
-                minHeight: height * 0.25,
+                minHeight: height * 0.20,
                 maxHeight: height * 0.40,
                 color: themeProvider.themeData.colorScheme.background,
                 boxShadow: const [BoxShadow(blurRadius: 1.0, color: silver)],
@@ -103,27 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    FutureBuilder(
-                        future: getGloss(translatedText),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.data == null) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: silver,
-                              ),
-                            );
-                          } else {
-                            return Center(
-                                child: Text(
-                              snapshot.data,
-                              style: const TextStyle(color: grey, fontSize: 24),
-                            ));
-                          }
-                        })
                   ],
                 ),
                 body: Container(
@@ -136,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
+                        width: MediaQuery.of(context).size.width * 0.2,
                         child: Align(
                           alignment: Alignment.center,
                           child: FutureBuilder(
@@ -184,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.7,
+                        width: MediaQuery.of(context).size.width * 0.8,
                         child: Align(
                           alignment: Alignment.center,
                           child: FutureBuilder(
@@ -199,9 +178,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                 } else if (poseSnapshot.hasError) {
                                   return Text('Error:${poseSnapshot.error}');
                                 } else if (poseSnapshot.hasData) {
-                                  return Image.memory(poseSnapshot.data);
+                                  return Image.memory(
+                                    poseSnapshot.data,
+                                    fit: BoxFit.fill,
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height:MediaQuery.of(context).size.height *0.9, 
+                                  );
                                 } else {
-                                  return const CircularProgressIndicator(color: Colors.grey,);
+                                  return const CircularProgressIndicator(
+                                    color: Colors.grey,
+                                  );
                                 }
                               }),
                         ),
