@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signbridge/home.dart';
-import 'package:signbridge/theme/theme_provider.dart';
+import 'package:signbridge/theme.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,27 +20,6 @@ class MyApp extends StatelessWidget {
             title: 'SignBridge',
             theme: themeProvider.themeData,
             home: const MyHomePage(),
-            // Add the theme toggle button to the app bar
-            builder: (context, child) {
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Colors.blue,
-                  title: Text('SignBridge'),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.light_mode_rounded,
-                        color: Colors.amber,
-                      ),
-                      onPressed: () {
-                        themeProvider.toggleTheme(); // Toggle the theme
-                      },
-                    ),
-                  ],
-                ),
-                body: child,
-              );
-            },
           );
         },
       ),

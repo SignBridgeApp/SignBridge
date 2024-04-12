@@ -6,7 +6,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:translator/translator.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'theme/theme_provider.dart'; // Import ThemeProvider class
+import 'package:signbridge/theme.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -53,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) {
         final themeProvider = Provider.of<ThemeProvider>(context);
         return Scaffold(
-          backgroundColor: themeProvider.themeData.colorScheme.background,
           body: Stack(
             children: [
               SlidingUpPanel(
@@ -135,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   child: Row(
                     children: [
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.3,
                         child: Align(
                           alignment: Alignment.center,
@@ -156,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: const Align(
                           alignment: Alignment.center,
@@ -170,12 +169,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+              const Padding(
+                padding: EdgeInsets.only(top: 40, right: 10),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: ThemeToggleButton(),
+                ),
+              ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: AvatarGlow(
-                    glowColor: isListening ? Colors.green : lightblue,
+                    glowColor: isListening ? blue : lightblue,
                     animate: isListening,
                     duration: const Duration(milliseconds: 1500),
                     repeat: true,
@@ -200,24 +206,21 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isListening ? blue : Colors.redAccent,
+                          color: isListening ? blue : lightblue,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: isListening
-                                  ? Colors.lightGreen
-                                  : Colors.transparent,
+                              color: isListening ? blue : lightblue,
                               blurRadius: 10,
                               spreadRadius: 3,
                             ),
                           ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16),
                           child: Icon(
                             Icons.mic,
-                            color:
-                                isListening ? Colors.white : Colors.redAccent,
+                            color: silver,
                           ),
                         ),
                       ),
