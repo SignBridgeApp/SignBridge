@@ -140,15 +140,42 @@ class _MyHomePageState extends State<MyHomePage> {
                           alignment: Alignment.center,
                           child: FutureBuilder(
                             future: getSign(translatedText),
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.data == null) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot signSnapshot) {
+                              if (signSnapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return const CircularProgressIndicator(
-                                  color: silver,
+                                  color: Colors.grey,
+                                );
+                              } else if (signSnapshot.hasError) {
+                                return Text('Error: ${signSnapshot.error}');
+                              } else if (signSnapshot.hasData) {
+                                return FutureBuilder(
+                                  future: getImg(signSnapshot.data),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot imgSnapshot) {
+                                    if (imgSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const CircularProgressIndicator(
+                                        color: Colors.grey,
+                                      );
+                                    } else if (imgSnapshot.hasError) {
+                                      return Text(
+                                          'Error: ${imgSnapshot.error}');
+                                    } else if (imgSnapshot.hasData) {
+                                      return Image.memory(
+                                        imgSnapshot.data,
+                                      );
+                                    } else {
+                                      return const CircularProgressIndicator(
+                                        color: Colors.grey,
+                                      );
+                                    }
+                                  },
                                 );
                               } else {
-                                return Image.network(
-                                  '$sign2imgURL?sign=${snapshot.data}&line_color=224,231,241,255',
+                                return const CircularProgressIndicator(
+                                  color: Colors.grey,
                                 );
                               }
                             },
@@ -161,7 +188,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           alignment: Alignment.center,
                           child: Text(
                             'GIF',
-                            style: TextStyle(color: silver, fontSize: 24),
+                            style: TextStyle(
+                              color: silver,
+                              fontSize: 24,
+                            ),
                           ),
                         ),
                       )

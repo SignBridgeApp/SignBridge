@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-            title: 'SignBridge',
+            title: 'Sign Bridge',
             theme: themeProvider.themeData,
             home: const MyHomePage(),
           );

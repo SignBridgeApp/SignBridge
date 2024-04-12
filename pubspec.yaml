@@ -5,7 +5,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.1 <4.0.0"
+  sdk: ">=3.2.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,12 +14,13 @@ dependencies:
   cupertino_icons: ^1.0.2
   avatar_glow: ^3.0.1
   sliding_up_panel: ^2.0.0+1
-  http: ^1.1.0
+  http: ^1.2.1
   speech_to_text: ^6.6.0
   translator: ^1.0.0
   google_fonts: 6.1.0
   provider:
   flutter_advanced_switch: ^3.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
