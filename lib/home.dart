@@ -21,6 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool speechEnabled = false;
   String selectedId = "en_US";
   String translatedText = "";
+  String gloss = "";
   TextEditingController textController = TextEditingController();
   @override
   void initState() {
@@ -118,8 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           } else {
                             return Center(
                                 child: Text(
-                              snapshot.data,
-                              style: const TextStyle(color: grey, fontSize: 24),
+                                  snapshot.data,
+                                  style: const TextStyle(color: grey, fontSize: 24),
                             ));
                           }
                         })
