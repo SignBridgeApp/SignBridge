@@ -119,8 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           } else {
                             return Center(
                                 child: Text(
-                                  snapshot.data,
-                                  style: const TextStyle(color: grey, fontSize: 24),
+                              snapshot.data,
+                              style: const TextStyle(color: grey, fontSize: 24),
                             ));
                           }
                         })
@@ -185,15 +185,25 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.7,
-                        child: const Align(
+                        child: Align(
                           alignment: Alignment.center,
-                          child: Text(
-                            'GIF',
-                            style: TextStyle(
-                              color: silver,
-                              fontSize: 24,
-                            ),
-                          ),
+                          child: FutureBuilder(
+                              future: getPose(translatedText),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot poseSnapshot) {
+                                if (poseSnapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator(
+                                    color: Colors.grey,
+                                  );
+                                } else if (poseSnapshot.hasError) {
+                                  return Text('Error:${poseSnapshot.error}');
+                                } else if (poseSnapshot.hasData) {
+                                  return Image.memory(poseSnapshot.data);
+                                } else {
+                                  return const CircularProgressIndicator(color: Colors.grey,);
+                                }
+                              }),
                         ),
                       )
                     ],

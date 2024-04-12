@@ -37,18 +37,23 @@ Future<String?> getGloss(String text) async {
 }
 
 Future<String?> getSign(String text) async {
-  if (text == "") return null;
-  String url = "$text2glossURL?text=$text";
+  String? gloss = await getGloss(text);
+  String url = "$gloss2signURL?gloss=$gloss";
   var responseData = await fetchData(url);
-  String gloss = responseData?['gloss'];
-  String finalUrl = "$gloss2signURL?gloss=$gloss";
-  var finalResponse = await fetchData(finalUrl);
-  return finalResponse?['sign'];
+  return responseData?['sign'];
 }
 
 Future<Uint8List?> getImg(String sign) async {
   if (sign == "") return null;
   String url = '$sign2imgURL?sign=$sign&line_color=224,231,241,255';
+  var responseData = await fetchData(url);
+  String? base64Image = responseData?['img'];
+  return imageFromBase64String(base64Image);
+}
+
+Future<Uint8List?> getPose(String text) async {
+  String? gloss = await getGloss(text);
+  String url = "$gloss2poseURL?gloss=$gloss";
   var responseData = await fetchData(url);
   String? base64Image = responseData?['img'];
   return imageFromBase64String(base64Image);

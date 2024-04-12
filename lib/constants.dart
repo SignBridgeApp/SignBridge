@@ -21,3 +21,4 @@ const String baseURL = "https://bipinkrish-signbridge.hf.space";
 const String gloss2signURL = "$baseURL/gloss2sign";
 const String sign2imgURL = "$baseURL/sign2img";
 const String text2glossURL = "$baseURL/text2gloss";
+const String gloss2poseURL = "$baseURL/gloss2pose";
