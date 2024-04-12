@@ -27,6 +27,17 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     initSpeech();
+    textController.addListener(_latestValue);
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  void _latestValue() {
+    translatedText = textController.text;
   }
 
   void initSpeech() async {
@@ -181,8 +192,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   return Image.memory(
                                     poseSnapshot.data,
                                     fit: BoxFit.fill,
-                                    width: MediaQuery.of(context).size.width * 0.9,
-                                    height:MediaQuery.of(context).size.height *0.9, 
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.9,
                                   );
                                 } else {
                                   return const CircularProgressIndicator(
