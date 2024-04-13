@@ -58,3 +58,10 @@ Future<Uint8List?> getPose(String text) async {
   String? base64Image = responseData?['img'];
   return imageFromBase64String(base64Image);
 }
+
+Future<List<String>?> getWords(String text) async {
+  String? gloss = await getGloss(text);
+  String url = "$gloss2poseURL?gloss=$gloss";
+  var responseData = await fetchData(url);
+  return responseData?['words'];
+}

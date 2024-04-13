@@ -306,6 +306,25 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Align(
+                      alignment: Alignment.topCenter,
+                      child: FutureBuilder(
+                          future: getWords(translatedText),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                snapshot.data,
+                                style: TextStyle(color: grey, fontSize: 24),
+                              );
+                            } else {
+                              return Text("");
+                            }
+                          })),
+                )
             ],
           ),
         );
