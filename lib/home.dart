@@ -21,7 +21,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool speechEnabled = false;
   String selectedId = "en_US";
   String translatedText = "";
-  String gloss = "";
   TextEditingController textController = TextEditingController();
   @override
   void initState() {
@@ -117,97 +116,128 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 body: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24.0),
-                      topRight: Radius.circular(24.0),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.2,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: FutureBuilder(
-                            future: getSign(translatedText),
-                            builder: (BuildContext context,
-                                AsyncSnapshot signSnapshot) {
-                              if (signSnapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const CircularProgressIndicator(
-                                  color: Colors.grey,
-                                );
-                              } else if (signSnapshot.hasError) {
-                                return Text('Error: ${signSnapshot.error}');
-                              } else if (signSnapshot.hasData) {
-                                return FutureBuilder(
-                                  future: getImg(signSnapshot.data),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot imgSnapshot) {
-                                    if (imgSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const CircularProgressIndicator(
-                                        color: Colors.grey,
-                                      );
-                                    } else if (imgSnapshot.hasError) {
-                                      return Text(
-                                          'Error: ${imgSnapshot.error}');
-                                    } else if (imgSnapshot.hasData) {
-                                      return Image.memory(
-                                        imgSnapshot.data,
-                                      );
-                                    } else {
-                                      return const CircularProgressIndicator(
-                                        color: Colors.grey,
-                                      );
-                                    }
-                                  },
-                                );
-                              } else {
-                                return const CircularProgressIndicator(
-                                  color: Colors.grey,
-                                );
-                              }
-                            },
-                          ),
-                        ),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24.0),
+                        topRight: Radius.circular(24.0),
                       ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: FutureBuilder(
-                              future: getPose(translatedText),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot poseSnapshot) {
-                                if (poseSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator(
-                                    color: Colors.grey,
-                                  );
-                                } else if (poseSnapshot.hasError) {
-                                  return Text('Error:${poseSnapshot.error}');
-                                } else if (poseSnapshot.hasData) {
-                                  return Image.memory(
-                                    poseSnapshot.data,
-                                    fit: BoxFit.fill,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height: MediaQuery.of(context).size.height *
-                                        0.9,
-                                  );
-                                } else {
-                                  return const CircularProgressIndicator(
-                                    color: Colors.grey,
-                                  );
-                                }
-                              }),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                    ),
+                    child: FutureBuilder(
+                        future: getGloss(translatedText),
+                        builder: (BuildContext context,
+                            AsyncSnapshot glossSnapshot) {
+                          if (glossSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: grey,
+                              ),
+                            );
+                          } else if (glossSnapshot.hasError) {
+                            return Text('Error: ${glossSnapshot.error}');
+                          } else if (glossSnapshot.hasData) {
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: FutureBuilder(
+                                        future: getSign(glossSnapshot.data),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot signSnapshot) {
+                                          if (signSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              color: grey,
+                                            );
+                                          } else if (signSnapshot.hasError) {
+                                            return Text(
+                                                'Error: ${signSnapshot.error}');
+                                          } else if (signSnapshot.hasData) {
+                                            return FutureBuilder(
+                                                future:
+                                                    getImg(signSnapshot.data),
+                                                builder: (BuildContext context,
+                                                    AsyncSnapshot imgSnapshot) {
+                                                  if (imgSnapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return CircularProgressIndicator(
+                                                      color: grey,
+                                                    );
+                                                  } else if (imgSnapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Error: ${imgSnapshot.error}');
+                                                  } else if (imgSnapshot
+                                                      .hasData) {
+                                                    return Image.memory(
+                                                      imgSnapshot.data,
+                                                    );
+                                                  } else {
+                                                    return CircularProgressIndicator(
+                                                      color: grey,
+                                                    );
+                                                  }
+                                                });
+                                          } else {
+                                            return CircularProgressIndicator(
+                                              color: grey,
+                                            );
+                                          }
+                                        }),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: FutureBuilder(
+                                        future: getPose(glossSnapshot.data),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot poseSnapshot) {
+                                          if (poseSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              color: grey,
+                                            );
+                                          } else if (poseSnapshot.hasError) {
+                                            return Text(
+                                                'Error:${poseSnapshot.error}');
+                                          } else if (poseSnapshot.hasData) {
+                                            return Image.memory(
+                                              poseSnapshot.data,
+                                              fit: BoxFit.fill,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.9,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.9,
+                                            );
+                                          } else {
+                                            return CircularProgressIndicator(
+                                              color: grey,
+                                            );
+                                          }
+                                        }),
+                                  ),
+                                )
+                              ],
+                            );
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: grey,
+                              ),
+                            );
+                          }
+                        })),
               ),
               const Padding(
                 padding: EdgeInsets.only(top: 40, right: 10),
@@ -311,19 +341,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.only(top: 50),
                   child: Align(
                       alignment: Alignment.topCenter,
-                      child: FutureBuilder(
-                          future: getWords(translatedText),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData) {
-                              return Text(
-                                snapshot.data,
-                                style: TextStyle(color: grey, fontSize: 24),
-                              );
-                            } else {
-                              return Text("");
-                            }
-                          })),
+                      child: Text(
+                        "Words",
+                        style: TextStyle(color: grey, fontSize: 24),
+                      )),
                 )
             ],
           ),

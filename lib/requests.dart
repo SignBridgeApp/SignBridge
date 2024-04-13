@@ -36,8 +36,7 @@ Future<String?> getGloss(String text) async {
   return responseData?['gloss'];
 }
 
-Future<String?> getSign(String text) async {
-  String? gloss = await getGloss(text);
+Future<String?> getSign(String gloss) async {
   String url = "$gloss2signURL?gloss=$gloss";
   var responseData = await fetchData(url);
   return responseData?['sign'];
@@ -51,17 +50,9 @@ Future<Uint8List?> getImg(String sign) async {
   return imageFromBase64String(base64Image);
 }
 
-Future<Uint8List?> getPose(String text) async {
-  String? gloss = await getGloss(text);
+Future<Uint8List?> getPose(String gloss) async {
   String url = "$gloss2poseURL?gloss=$gloss";
   var responseData = await fetchData(url);
   String? base64Image = responseData?['img'];
   return imageFromBase64String(base64Image);
-}
-
-Future<List<String>?> getWords(String text) async {
-  String? gloss = await getGloss(text);
-  String url = "$gloss2poseURL?gloss=$gloss";
-  var responseData = await fetchData(url);
-  return responseData?['words'];
 }
