@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:signbridge/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:signbridge/constants.dart';
 
 ThemeData light = ThemeData(
   useMaterial3: true,
@@ -8,6 +9,7 @@ ThemeData light = ThemeData(
   colorScheme: const ColorScheme.light(
     background: white,
   ),
+  textTheme: GoogleFonts.openSansTextTheme(),
 );
 
 ThemeData dark = ThemeData(
@@ -16,6 +18,7 @@ ThemeData dark = ThemeData(
   colorScheme: const ColorScheme.dark(
     background: black,
   ),
+  textTheme: GoogleFonts.openSansTextTheme(),
 );
 
 class ThemeProvider with ChangeNotifier {

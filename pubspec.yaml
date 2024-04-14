@@ -18,10 +18,9 @@ dependencies:
   speech_to_text: ^6.6.0
   translator: ^1.0.0
   google_fonts: 6.1.0
-  provider:
+  provider: ^6.1.2
   flutter_advanced_switch: ^3.1.0
-  signwriting_flutter: ^1.0.1
-
+#   signwriting_flutter: ^1.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -31,19 +30,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # assets:
-  #   - assets/gif/demo.gif
-  #   - assets/pose/sample.pose
-
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #         weight: 700
-  #   - family: Trajan Pro
 
 flutter_launcher_icons:
   android: "launcher_icon"
