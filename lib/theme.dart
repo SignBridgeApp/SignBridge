@@ -51,6 +51,7 @@ class ThemeToggleButton extends StatelessWidget {
     return IconButton(
       color: silver,
       icon: Icon(
+        color: themeProvider.isDarkMode ? silver : black,
         themeProvider.isDarkMode
             ? Icons.light_mode_rounded
             : Icons.dark_mode_rounded,

@@ -2,7 +2,7 @@ name: signbridge
 description: Effortless Real-Time Sign Language Production
 
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
@@ -20,7 +20,8 @@ dependencies:
   google_fonts: 6.1.0
   provider: ^6.1.2
   flutter_advanced_switch: ^3.1.0
-#   signwriting_flutter: ^1.0.1
+  # signwriting_flutter: ^1.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

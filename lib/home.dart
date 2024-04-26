@@ -16,16 +16,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool isListening = false;
+  bool speechEnabled = false;
+  bool isActive = false;
+
   final SpeechToText v2t = SpeechToText();
   final GoogleTranslator translator = GoogleTranslator();
-  bool speechEnabled = false;
+
   String selectedId = "en_US";
   String translatedText = "";
   TextEditingController textController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     initSpeech();
+    updateStatus();
     textController.addListener(_latestValue);
   }
 
@@ -33,6 +38,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     textController.dispose();
     super.dispose();
+  }
+
+  void updateStatus() async {
+    isActive = await getStatus();
+    refresh();
   }
 
   void _latestValue() {
@@ -47,11 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void translateText() async {
     if (textController.text.isNotEmpty) {
       if (selectedId == "en_US") {
-        translatedText = textController.text;
+        translatedText = textController.text.trim().toLowerCase();
       } else {
         Translation translation =
             await translator.translate(textController.text, to: 'en');
-        translatedText = translation.text;
+        translatedText = translation.text.trim().toLowerCase();
       }
     }
     refresh();
@@ -64,19 +74,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return Builder(
       builder: (context) {
         final themeProvider = Provider.of<ThemeProvider>(context);
+        final primaryColor = themeProvider.isDarkMode ? black : white;
+        final secondaryColor = themeProvider.isDarkMode ? silver : black;
+        final tertiaryColor = themeProvider.isDarkMode ? grey : black;
+
         return Scaffold(
+          backgroundColor: primaryColor,
           body: Stack(
             children: [
               SlidingUpPanel(
                 minHeight: height * 0.25,
                 maxHeight: height * 0.40,
-                color: themeProvider.themeData.colorScheme.background,
-                boxShadow: const [BoxShadow(blurRadius: 1.0, color: silver)],
+                color: primaryColor,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 1.0,
+                    color: secondaryColor,
+                  )
+                ],
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24.0),
                   topRight: Radius.circular(24.0),
                 ),
-                panel: getPanel(),
+                panel: getPanel(secondaryColor, tertiaryColor),
                 // Body
                 body: Container(
                   decoration: const BoxDecoration(
@@ -92,22 +112,33 @@ class _MyHomePageState extends State<MyHomePage> {
                         (BuildContext context, AsyncSnapshot glossSnapshot) {
                       if (glossSnapshot.connectionState ==
                           ConnectionState.waiting) {
-                        return getCenteretLoader();
+                        return getCenteretLoader(tertiaryColor);
                       } else if (glossSnapshot.hasError) {
                         return Text('Error: ${glossSnapshot.error}');
                       } else if (glossSnapshot.hasData) {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            getPoseAndWordsVis(height, glossSnapshot),
-                            getHamVis(height, glossSnapshot),
+                            getPoseAndWordsVis(
+                              height,
+                              glossSnapshot,
+                              tertiaryColor,
+                            ),
+                            getHamVis(
+                              height,
+                              glossSnapshot,
+                              tertiaryColor,
+                              themeProvider.isDarkMode,
+                            ),
                           ],
                         );
                       } else {
-                        return const Center(
+                        return Center(
                           child: Text(
                             "Talk something or type",
-                            style: TextStyle(color: grey),
+                            style: TextStyle(
+                              color: tertiaryColor,
+                            ),
                           ),
                         );
                       }
@@ -124,19 +155,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               // Tools
-              getMicButton(),
-              getLangButton(),
+              getMicButton(secondaryColor),
+              getLangButton(secondaryColor, tertiaryColor),
+              getURLButton(secondaryColor),
               // Tranaslated text
               if (selectedId != "en_US" && translatedText.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 50),
+                  padding: const EdgeInsets.only(top: 50, left: 20),
                   child: Align(
-                    alignment: Alignment.topCenter,
+                    alignment: Alignment.topLeft,
                     child: Text(
                       translatedText,
-                      style: const TextStyle(
-                        color: grey,
-                        fontSize: 24,
+                      style: TextStyle(
+                        color: tertiaryColor,
+                        fontSize: 20,
                       ),
                     ),
                   ),
@@ -148,7 +180,77 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Align getMicButton() {
+  Align getURLButton(Color secondaryColor) {
+    Future<String?> askURL() {
+      return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          String name = '';
+          return AlertDialog(
+            title: Text(
+              'Enter Base URL',
+              style: TextStyle(color: secondaryColor),
+            ),
+            content: TextField(
+              controller: TextEditingController(text: baseURL),
+              style: TextStyle(color: secondaryColor),
+              onChanged: (value) {
+                name = value;
+              },
+              onSubmitted: (value) => Navigator.of(context).pop(value),
+              decoration: const InputDecoration(
+                hintText: 'Enter Base URL',
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                child: const Text('Set'),
+                onPressed: () {
+                  Navigator.of(context).pop(name);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isActive ? Colors.green : Colors.red,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: TextButton(
+            onPressed: () async {
+              String? url = await askURL();
+              if (url != null) {
+                baseURL = url;
+                refresh();
+                updateStatus();
+              }
+            },
+            child: Icon(
+              Icons.link_rounded,
+              color: secondaryColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Align getMicButton(Color secondaryColor) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
@@ -189,11 +291,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Icon(
-                  Icons.mic,
-                  color: silver,
+                  Icons.mic_rounded,
+                  color: secondaryColor,
                 ),
               ),
             ),
@@ -203,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Align getLangButton() {
+  Align getLangButton(Color secondaryColor, Color tertiaryColor) {
     return Align(
       alignment: Alignment.bottomLeft,
       child: Padding(
@@ -216,12 +318,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: TextButton(
             onPressed: () {
-              _showOptionsDialog(context);
+              _showOptionsDialog(context, tertiaryColor);
             },
             child: Text(
               langs[selectedId]!,
-              style: const TextStyle(
-                color: silver,
+              style: TextStyle(
+                color: secondaryColor,
               ),
             ),
           ),
@@ -230,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Column getPanel() {
+  Column getPanel(Color secondaryColor, Color tertiaryColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -241,23 +343,24 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: TextField(
             controller: textController,
-            style: const TextStyle(
-              color: grey,
+            style: TextStyle(
+              color: tertiaryColor,
               fontSize: 24,
             ),
             autocorrect: true,
             showCursor: true,
-            cursorColor: silver,
+            cursorColor: secondaryColor,
             maxLines: 2,
+            onChanged: (value) => textController.text = value.toLowerCase(),
             decoration: InputDecoration(
               hintText: 'Talk or type',
               border: InputBorder.none,
-              hintStyle: const TextStyle(color: grey),
+              hintStyle: TextStyle(color: tertiaryColor),
               suffixIcon: textController.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(
-                        Icons.clear,
-                        color: grey,
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: tertiaryColor,
                       ),
                       onPressed: () {
                         textController.clear();
@@ -272,14 +375,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  SizedBox getPoseAndWordsVis(double height, AsyncSnapshot glossSnapshot) {
+  SizedBox getPoseAndWordsVis(
+      double height, AsyncSnapshot glossSnapshot, Color tertiaryColor) {
     return SizedBox(
       height: height * 0.55,
       child: FutureBuilder(
         future: getPose(glossSnapshot.data),
         builder: (BuildContext context, AsyncSnapshot poseSnapshot) {
           if (poseSnapshot.connectionState == ConnectionState.waiting) {
-            return getCenteretLoader();
+            return getCenteretLoader(tertiaryColor);
           } else if (poseSnapshot.hasError) {
             return Text('Error:${poseSnapshot.error}');
           } else if (poseSnapshot.hasData) {
@@ -293,8 +397,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(height: height * 0.02),
                 Text(
                   poseSnapshot.data.words.join(" "),
-                  style: const TextStyle(
-                    color: grey,
+                  style: TextStyle(
+                    color: tertiaryColor,
                     fontSize: 16,
                   ),
                   textAlign: TextAlign.center,
@@ -302,29 +406,30 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             );
           } else {
-            return getCenteretLoader();
+            return getCenteretLoader(tertiaryColor);
           }
         },
       ),
     );
   }
 
-  SizedBox getHamVis(double height, AsyncSnapshot glossSnapshot) {
+  SizedBox getHamVis(double height, AsyncSnapshot glossSnapshot,
+      Color tertiaryColor, bool isDark) {
     return SizedBox(
-      height: height * 0.15,
+      height: height * 0.12,
       child: FutureBuilder(
         future: getSign(glossSnapshot.data),
         builder: (BuildContext context, AsyncSnapshot signSnapshot) {
           if (signSnapshot.connectionState == ConnectionState.waiting) {
-            return getCenteretLoader();
+            return getCenteretLoader(tertiaryColor);
           } else if (signSnapshot.hasError) {
             return Text('Error: ${signSnapshot.error}');
           } else if (signSnapshot.hasData) {
             return FutureBuilder(
-                future: getImg(signSnapshot.data),
+                future: getImg(signSnapshot.data, isDark),
                 builder: (BuildContext context, AsyncSnapshot imgSnapshot) {
                   if (imgSnapshot.connectionState == ConnectionState.waiting) {
-                    return getCenteretLoader();
+                    return getCenteretLoader(tertiaryColor);
                   } else if (imgSnapshot.hasError) {
                     return Text('Error: ${imgSnapshot.error}');
                   } else if (imgSnapshot.hasData) {
@@ -336,34 +441,35 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     );
                   } else {
-                    return getCenteretLoader();
+                    return getCenteretLoader(tertiaryColor);
                   }
                 });
           } else {
-            return getCenteretLoader();
+            return getCenteretLoader(tertiaryColor);
           }
         },
       ),
     );
   }
 
-  Center getCenteretLoader() {
-    return const Center(
+  Center getCenteretLoader(Color tertiaryColor) {
+    return Center(
       child: CircularProgressIndicator(
-        color: grey,
+        color: tertiaryColor,
       ),
     );
   }
 
-  Future<void> _showOptionsDialog(BuildContext context) async {
+  Future<void> _showOptionsDialog(
+      BuildContext context, Color tertiaryColor) async {
     String? selectedOption = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           scrollable: true,
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             fontWeight: FontWeight.bold,
-            color: grey,
+            color: tertiaryColor,
             fontSize: 24,
           ),
           title: const Text('Select a language'),

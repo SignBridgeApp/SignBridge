@@ -20,6 +20,16 @@ Uint8List? imageFromBase64String(String? base64String) {
   }
 }
 
+Future<bool> getStatus() async {
+  try {
+    final response = await http.get(Uri.parse(baseURL));
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint('Error fetching data: $e');
+    return false;
+  }
+}
+
 Future<Map<String, dynamic>?> fetchData(String url) async {
   try {
     debugPrint("url: $url");
@@ -40,21 +50,31 @@ Future<Map<String, dynamic>?> fetchData(String url) async {
 
 Future<String?> getGloss(String text) async {
   if (text == "") return null;
+
+  String text2glossURL = "$baseURL/text2gloss";
   String url = "$text2glossURL?text=$text";
+
   var responseData = await fetchData(url);
   return responseData?['gloss'];
 }
 
 Future<String?> getSign(String gloss) async {
   if (gloss == "") return null;
+
+  String gloss2signURL = "$baseURL/gloss2sign";
   String url = "$gloss2signURL?gloss=$gloss";
+
   var responseData = await fetchData(url);
   return responseData?['sign'];
 }
 
-Future<Uint8List?> getImg(String sign) async {
+Future<Uint8List?> getImg(String sign, bool isDark) async {
   if (sign == "") return null;
-  String url = '$sign2imgURL?sign=$sign&line_color=224,231,241,255';
+
+  String sign2imgURL = "$baseURL/sign2img";
+  String url =
+      '$sign2imgURL?sign=$sign&line_color=${isDark ? "224,231,241,255" : "0,0,0,255"}';
+
   var responseData = await fetchData(url);
   String? base64Image = responseData?['img'];
   return imageFromBase64String(base64Image);
@@ -62,7 +82,10 @@ Future<Uint8List?> getImg(String sign) async {
 
 Future<PoseAndWords?> getPose(String gloss) async {
   if (gloss == "") return null;
+
+  String gloss2poseURL = "$baseURL/gloss2pose";
   String url = "$gloss2poseURL?gloss=$gloss";
+
   var responseData = await fetchData(url);
   String? base64Image = responseData?['img'];
   return PoseAndWords(
