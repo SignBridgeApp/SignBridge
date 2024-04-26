@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               SlidingUpPanel(
                 minHeight: height * 0.25,
-                maxHeight: height * 0.40,
+                maxHeight: height * 0.25,
                 color: primaryColor,
                 boxShadow: [
                   BoxShadow(
@@ -135,7 +135,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       } else {
                         return Center(
                           child: Text(
-                            "Talk something or type",
+                            isActive
+                                ? "Talk something or type"
+                                : "Failed to connect. check 'Base URL'",
                             style: TextStyle(
                               color: tertiaryColor,
                             ),
@@ -192,6 +194,8 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(color: secondaryColor),
             ),
             content: TextField(
+              minLines: 1,
+              maxLines: 100,
               controller: TextEditingController(text: baseURL),
               style: TextStyle(color: secondaryColor),
               onChanged: (value) {
@@ -251,18 +255,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Align getMicButton(Color secondaryColor) {
+    final nowColor = !isActive
+        ? grey
+        : isListening
+            ? blue
+            : lightblue;
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: AvatarGlow(
-          glowColor: isListening ? blue : lightblue,
-          animate: isListening,
+          glowColor: nowColor,
+          animate: isActive && isListening,
           duration: const Duration(milliseconds: 1500),
           repeat: true,
           glowShape: BoxShape.circle,
           child: GestureDetector(
             onTap: () {
+              if (!isActive) return;
+
               isListening = !isListening;
               if (isListening) {
                 if (speechEnabled) {
@@ -281,11 +292,11 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: isListening ? blue : lightblue,
+                color: nowColor,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: isListening ? blue : lightblue,
+                    color: nowColor,
                     blurRadius: 10,
                     spreadRadius: 3,
                   ),
@@ -312,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.all(20.0),
         child: Container(
           decoration: BoxDecoration(
-            color: blue,
+            color: isActive ? blue : grey,
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(20),
           ),
@@ -342,6 +353,7 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: TextField(
+            enabled: isActive,
             controller: textController,
             style: TextStyle(
               color: tertiaryColor,
@@ -395,13 +407,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   fit: BoxFit.fitWidth,
                 ),
                 SizedBox(height: height * 0.02),
-                Text(
-                  poseSnapshot.data.words.join(" "),
-                  style: TextStyle(
-                    color: tertiaryColor,
-                    fontSize: 16,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    poseSnapshot.data.words.join(" "),
+                    style: TextStyle(
+                      color: tertiaryColor,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             );
