@@ -137,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text(
                             isActive
                                 ? "Talk something or type"
-                                : "Failed to connect. check 'Base URL'",
+                                : 'Failed to connect. check "Base URL"',
                             style: TextStyle(
                               color: tertiaryColor,
                             ),
@@ -329,7 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: TextButton(
             onPressed: () {
-              _showOptionsDialog(context, tertiaryColor);
+              _showOptionsDialog(context, secondaryColor, tertiaryColor);
             },
             child: Text(
               langs[selectedId]!,
@@ -476,28 +476,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _showOptionsDialog(
-      BuildContext context, Color tertiaryColor) async {
+      BuildContext context, Color secondaryColor, Color tertiaryColor) async {
     String? selectedOption = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           scrollable: true,
-          titleTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: tertiaryColor,
-            fontSize: 24,
+          title: ListTile(
+            title: const Text('Select a language'),
+            isThreeLine: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            minVerticalPadding: 0,
+            titleTextStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: secondaryColor,
+              fontSize: 24,
+            ),
+            subtitle: const Text(
+              "You need to have the language pack installed for the selected language.",
+            ),
+            subtitleTextStyle: TextStyle(
+              fontStyle: FontStyle.italic,
+              color: tertiaryColor,
+              fontSize: 14,
+            ),
           ),
-          title: const Text('Select a language'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: langs.keys.map((String key) {
-                return ListTile(
-                  title: Text(langs[key]!),
-                  onTap: () {
-                    Navigator.of(context).pop(key);
-                  },
-                );
-              }).toList(),
+          content: Container(
+            constraints: const BoxConstraints(maxHeight: 400),
+            child: SingleChildScrollView(
+              child: ListBody(
+                children: langs.keys.map((String key) {
+                  return ListTile(
+                    title: Text(langs[key]!),
+                    onTap: () {
+                      Navigator.of(context).pop(key);
+                    },
+                  );
+                }).toList(),
+              ),
             ),
           ),
         );

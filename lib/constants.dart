@@ -12,9 +12,26 @@ final bool isAndroid = Platform.isAndroid;
 final bool isIos = Platform.isIOS;
 
 const Map<String, String> langs = {
+  "ar": "Arabic",
+  "bn": "Bengali",
+  "zh-CN": "Chinese",
+  "de": "German",
   "en_US": "English",
+  "es": "Spanish",
+  "fr": "French",
+  "gu": "Gujarati",
   "hi": "Hindi",
+  "it": "Italian",
+  "ja": "Japanese",
   "kn": "Kannada",
+  "ko": "Korean",
+  "ml": "Malayalam",
+  "mr": "Marathi",
+  "pt-BR": "Portuguese",
+  "ru": "Russian",
+  "ta": "Tamil",
+  "te": "Telugu",
+  "ur": "Urdu",
 };
 
 String baseURL = "https://bipinkrish-signbridge.hf.space";
